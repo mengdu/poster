@@ -1,43 +1,18 @@
 
-## 视频截图工具
+## Poster
 
-poster是一个专门为视频截图的小工具。
-可以在预览视频的时候选择一个适合的界面把它截取下来，并存成图片。
+这是一个前端 Video 视频播放截图工具。
 
-## 使用
+通过 canvas 实现从video标签截取当前播放画面。
 
-### 简单使用
-主要文件：
-```
-<script src="poster.js"></script>
-```
-在视频预览界面调用：
+## use
 
-```
-poster($('video')[0],function(e){
-  //console.log(e);
-  if(e.bool){
-    //输出文件对象
-    var blob=e.data;//返回的是blob对象
-    console.log(blob);
-    p.src=window.URL.createObjectURL(e.data);//创建一个临时预览路径
-  }
-
-});
+```html
+<script src="./libs/video.js"></script>
 ```
 
-### 使用extendvideo.js
-`extendvideo.js`与`poster.js`不同的是前者会在引入它的页面里每个`video`标签里增加一个`getPoster()`方法
-。
-
-用法：
-```
-var blob=$('video')[0].getPoster();//返回图片blob对象
-```
-
-
-## 原理
-此视频截图工具，采用了canvas绘图函数实现video图片截取，产生base64编码图片信息，再通过转blob。
++ **window.$poster.videoScreenshot(video, time, cb(err, blob))** 视频截图，不支持跨域；time 为指定视频进度，默认为0
++ **window.$poster.getVideoDuration(url, cb(err, blob))** 获取视频时长
 
 ## 兼容性
 

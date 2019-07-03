@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Video Demo</title>
+  <style>
+    .demo {
+      display: flex;
+      justify-content: center;
+    }
+    .demo .video-box,
+    .demo .img-box {
+      border: solid 1px #15B7F5;
+      width: 800px;
+      margin: 10px;
+      text-align: center;
+      line-height: 0;
+    }
+    .demo .video-box video,
+    .demo .img-box img {
+      max-width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <input type="file" id="file" />
+    <!-- <input type="text" id="url" placeholder="url" /> -->
+    <button id="play">播放</button>
+  </div>
+  <div class="demo">
+    <div class="video-box"><video src="./movie.webm" id="video" class="video" controls></video></div>
+    <div class="img-box"><img src="" alt="" id="img" /></div>
+  </div>
+  <div>
+    <button id="jietu">截图</button>
+  </div>
+  <script src="./libs/poster.js"></script>
+  <script>
+    var video = document.getElementById('video')
+    var jietu = document.getElementById('jietu')
+    var img = document.getElementById('img')
+    var file = document.getElementById('file')
+    // var url = document.getElementById('url')
+    var play = document.getElementById('play')
+
+    var playing = false
+    video.addEventListener('play', function () {
+      playing = true
+    })
+    video.addEventListener('pause', function () {
+      playing = false
+    })
+    var url = ''
+    play.onclick = function () {
+      if (url) video.src = url
+
+      if (playing) {
+        video.pause()
+        play.innerHTML = '播放'
+      } else {
+        video.play()
+        play.innerHTML = '暂停'
+      }
+    }
+
+    file.onchange = function () {
+      if (file.files.length > 0) {
+        video.src = URL.createObjectURL(file.files[0])
+        video.play()
+      }
+    }
+
+    jietu.onclick = function () {
+      window.$poster.videoScreenshot(video, video.currentTime, function (err, blob) {
+        if (err) {
+          return alert(err.message)
+        }
+        console.log(blob)
+        img.src = URL.createObjectURL(blob)
+        var imgName = Date.now() + '.png'
+        var imgFile = new File([Blob], imgName, { type: 'image/png' })
+
+        console.log(imgFile)
+      })
+    }
+  </script>
+</body>
+</html>
