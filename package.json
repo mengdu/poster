@@ -1,0 +1,24 @@
+{
+  "name": "poster",
+  "version": "0.1.0",
+  "description": "这是一个前端 Video 视频播放截图工具。",
+  "main": "libs/poster.js",
+  "scripts": {
+    "dev": "dev serve -owp 3002",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mengdu/poster.git"
+  },
+  "keywords": [
+    "poster",
+    "video-screenshot"
+  ],
+  "author": "lanyueos@qq.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mengdu/poster/issues"
+  },
+  "homepage": "https://github.com/mengdu/poster#readme"
+}
