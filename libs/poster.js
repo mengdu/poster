@@ -103,8 +103,14 @@
         if (typeof cb === 'function') cb(null, result)
       } else {
         if (isMultiple) {
-          video.addEventListener('canplay', exec, false)
-          video.currentTime = time[i]
+          try {
+            video.addEventListener('canplay', exec, false)
+            // 未加载完成设置时间会存在报错
+            video.currentTime = time[i]
+          } catch (err) {
+            video.removeEventListener('canplay', exec, false)
+            if (typeof cb === 'function') cb(err, null)
+          }
         } else {
           exec()
         }
