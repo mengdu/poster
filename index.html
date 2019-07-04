@@ -60,16 +60,16 @@
     var play = document.getElementById('play')
 
     var playing = false
-    var videoDone = false
+    // var videoDone = false
 
-    video.addEventListener('loadstart', function () {
-      console.log('loadstart')
-      videoDone = false
-    })
-    video.addEventListener('canplaythrough', function () {
-      console.log('canplaythrough')
-      videoDone = true
-    })
+    // video.addEventListener('loadstart', function () {
+    //   console.log('loadstart')
+    //   videoDone = false
+    // })
+    // video.addEventListener('canplaythrough', function () {
+    //   console.log('canplaythrough')
+    //   videoDone = true
+    // })
 
     video.addEventListener('play', function () {
       playing = true
@@ -118,7 +118,7 @@
     }
 
     function screenshotMultiple (times) {
-      if (!videoDone) return alert('请等待视频加载完成在执行')
+      // if (!videoDone) return alert('请等待视频加载完成在执行')
 
       $poster.videoScreenshot(video, times || [1,5,6,8,3,10,20,30,40,50], function (err, res) {
         if (err) return alert(err.message)
