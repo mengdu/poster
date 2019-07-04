@@ -22,6 +22,16 @@
     .demo .img-box img {
       max-width: 100%;
     }
+
+    #imgs {
+      text-align: center;
+      padding: 15px;
+    }
+
+    #imgs img {
+      width: 320px;
+      height: 150px;
+    }
   </style>
 </head>
 <body>
@@ -36,7 +46,10 @@
   </div>
   <div>
     <button id="jietu">截图</button>
+    <button id="jieTuMultiple">截多张</button>
+    <button id="jieRandomTuMultiple">随机10张</button>
   </div>
+  <div id="imgs"></div>
   <script src="./libs/poster.js"></script>
   <script>
     var video = document.getElementById('video')
@@ -74,17 +87,56 @@
     }
 
     jietu.onclick = function () {
-      window.$poster.videoScreenshot(video, video.currentTime, function (err, blob) {
+      window.$poster.videoScreenshot(video, video.currentTime, function (err, res) {
         if (err) {
           return alert(err.message)
         }
-        console.log(blob)
-        img.src = URL.createObjectURL(blob)
+        console.log(res)
+        img.src = URL.createObjectURL(res[0].blob)
+
         var imgName = Date.now() + '.png'
-        var imgFile = new File([Blob], imgName, { type: 'image/png' })
+        var imgFile = new File([res[0].blob], imgName, { type: 'image/png' })
 
         console.log(imgFile)
       })
+    }
+
+    
+    function rand (num1, num2) {
+      return Math.floor(Math.random() * (num2 - num1 + 1) + num1)
+    }
+
+    function screenshotMultiple (times) {
+      $poster.videoScreenshot(video, times || [1,5,6,8,3,10,20,30,40,50], function (err, res) {
+        if (err) return alert(err.message)
+
+        console.log(res)
+
+        var html = res.map(function (e) {
+          return '<img src="' + URL.createObjectURL(e.blob) + '" />'
+        })
+
+        document.getElementById('imgs').innerHTML = html
+      })
+    }
+
+    jieTuMultiple.onclick = function () { screenshotMultiple() }
+    jieRandomTuMultiple.onclick = function () {
+      var times = []
+      while (times.length < 10) {
+        var el = rand(5, 95)
+        if (times.indexOf(el) === -1) {
+          times.push(el)
+        }
+      }
+
+      times = times.sort(function (a, b) {
+        return a - b
+      }).map(function (e) {
+        return (e / 100) * video.duration
+      })
+
+      screenshotMultiple(times)
     }
   </script>
 </body>
