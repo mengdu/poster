@@ -39,41 +39,89 @@
   /**
    * 视频截图，由于浏览器限制，不支持跨域视频截图
    * @param {HTMLVideoElement} video - 视频标签
-   * @param {number} time - 指定截图视频播放位置，秒；默认 0，截图当前播放位置
-   * @param {function} cb - 回调函数，返回 Blob
+   * @param {number|[]} time - 指定截图视频播放位置，秒；0 表示截取当前
+   * @param {number[]} size - 指定输出尺寸，默认输出原尺寸；可选
+   * @param {function} cb - 回调函数，返回 [{orgSize, size, at, blob}]
    * **/
-  function videoScreenshot (video, time, cb) {
+  function videoScreenshot (video, time, size, cb) {
     time = time || 0
+    cb = typeof size === 'function' ? size : cb
+
+    if (!(video instanceof HTMLVideoElement)) {
+      if (typeof cb === 'function') cb(new Error('`video` 参数必须是 HTMLVideoElement 对象'), null)
+      return
+    }
+
     var canvas = document.createElement('canvas')
-    var width = video.videoWidth
-    var height = video.videoHeight
-    canvas.width = width
-    canvas.height = height
+    var vw = video.videoWidth
+    var vh = video.videoHeight
+    canvas.width = vw
+    canvas.height = vh
     var ctx = canvas.getContext('2d')
 
-    function run () {
-      ctx.drawImage(video, 0, 0, width, height, 0, 0, width, height)
+    var orgSize = vw + 'x' + vh
+    var result = []
+    var index = 0
+    var isMultiple = Object.prototype.toString.call(time) === '[object Array]'
+    var length = isMultiple ? time.length : 1
+    var hasSize = Object.prototype.toString.call(size) === '[object Array]' && size.length >= 2
+    var targetSize = hasSize ? size[0] + 'x' + size[1] : orgSize
+
+    if (isMultiple) video.pause()
+
+    function exec () {
+      ctx.drawImage(video, 0, 0, vw, vh, 0, 0, vw, vh)
+      var currentTime = video.currentTime
+      var cvas = null
+
+      // 输出指定尺寸
+      if (hasSize) {
+        cvas = toSize(canvas, [vw, vh], size)
+      } else {
+        cvas = canvas
+      }
 
       try {
-        if (canvas.toBlob) {
-          canvas.toBlob(function (blob) {
-            if (typeof cb === 'function') cb(null, blob)
+        if (cvas.toBlob) {
+          cvas.toBlob(function (blob) {
+            result.push({ orgSize: orgSize, size: targetSize, at: currentTime, blob: blob, })
+            run(++index)
           })
         } else {
-          if (typeof cb === 'function') cb(null, dataURLtoBlob(canvas.toDataURL()))
+          result.push({ orgSize: orgSize, size: targetSize, at: currentTime, blob: dataURLtoBlob(cvas.toDataURL()) })
+          run(++index)
         }
       } catch (err) {
-        cb(err, null)
+        if (typeof cb === 'function') cb(err, null)
       }
-      video.removeEventListener('canplay', run, false)
+      video.removeEventListener('canplay', exec, false)
     }
 
-    if (time > 0) {
-      video.addEventListener('canplay', run, false)
-      video.currentTime = time
-    } else {
-      run()
+    function run (i) {
+      index = i
+      if (i >= length) {
+        if (typeof cb === 'function') cb(null, result)
+      } else {
+        if (isMultiple) {
+          video.addEventListener('canplay', exec, false)
+          video.currentTime = time[i]
+        } else {
+          exec()
+        }
+      }
     }
+
+    run(0)
+
+    return canvas
+  }
+
+  function toSize (img, orgSize, size) {
+    var canvas = document.createElement('canvas')
+    canvas.width = size[0]
+    canvas.height = size[1]
+    var ctx = canvas.getContext('2d')
+    ctx.drawImage(img, 0, 0, orgSize[0], orgSize[1], 0, 0, size[0], size[1])
 
     return canvas
   }
