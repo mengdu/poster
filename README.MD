@@ -17,7 +17,7 @@
   - size [w, h] 指定输出尺寸，默认输出原尺寸；可选
   - cb 回调函数，返回 (err, {orgSize, size, at, blob})
 
-+ **window.$poster.getVideoDuration(url, cb(err, blob))** 获取视频时长
++ **window.$poster.getMetadata(url, cb(err, data))** 获取视频数据元
 
 ## 兼容性
 

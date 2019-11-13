@@ -1,18 +1,25 @@
 (function (root) {
   /**
-   * 获取视频时长，秒
+   * 获取视频元数据
    * @param {string} src - 视频连接
-   * @param {function} cb - 回调
+   * @param {function} cb(err, data) - 回调
    * **/
-  function getVideoDuration (src, cb) {
+  function getMetadata (src, cb) {
     var v = document.createElement('video')
     v.src = src
     v.style.display = 'none'
-  
-    v.addEventListener('loadeddata', function () {
-      cb && cb(null, v.duration)
-      v.remove()
-      v = null
+
+    v.addEventListener('loadedmetadata', function () {
+      cb && cb(null, {
+        duration: v.duration,
+        w: v.videoWidth,
+        h: v.videoHeight,
+        video: v
+      })
+    })
+
+    v.addEventListener('error', function () {
+      cb && cb(v.error)
     })
   
     document.body.appendChild(v)
@@ -133,7 +140,7 @@
   }
 
   root.$poster = {
-    getVideoDuration: getVideoDuration,
+    getMetadata: getMetadata,
     videoScreenshot: videoScreenshot
   }
 
